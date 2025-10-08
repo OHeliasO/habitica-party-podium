@@ -113,20 +113,6 @@ def aggregate_team_skills(
     return skills
 
 
-def spell_name(spell_code: str) -> str:
-    """
-    Maps spell codes to user-friendly names.
-    Extend this mapping as needed.
-    """
-    mapping = {
-        "healAll": "Bénédiction",
-        "protectAura": "Aura de protection",
-        "snowball": "Boule de neige",
-        # Add more mappings as needed
-    }
-    return mapping.get(spell_code, spell_code)
-
-
 def generate_markdown_report(
     user_stats: Dict[str, Dict[str, float]],
     period_start: datetime,
