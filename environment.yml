@@ -5,4 +5,5 @@ channels:
 dependencies:
   - python=3.11
   - python-dotenv
+  - requests
 prefix: /home/helias/miniconda3/envs/HABITICA
