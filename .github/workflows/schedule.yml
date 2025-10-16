@@ -23,11 +23,11 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: HABITICA   # Match the name inside your environment.yml
+          activate-environment: HABITICA
           environment-file: environment.yml
           auto-activate-base: false
-          use-mamba: true                      # Faster dependency solving
-          cache: true                              # ✅ Enable caching
+          use-mamba: true
+          cache: true
 
       - name: Verify environment
         run: |
@@ -35,5 +35,4 @@ jobs:
           conda list
 
       - name: Run Habitica report script
-        run: |
-          python src/main.py
+        run: conda run -n HABITICA python src/main.py
