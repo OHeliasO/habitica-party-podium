@@ -1,0 +1,38 @@
+name: Daily Habitica Podium Update
+
+on:
+  schedule:
+    # ⏰ Runs every day at 07:00 UTC
+    - cron: "0 7 * * *"
+  workflow_dispatch:  # ✅ Allow manual trigger
+
+jobs:
+  update-podium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5   # 🕔 Limit job runtime to 5 minutes total
+
+    env:
+      API_USER_ID: ${{ secrets.API_USER_ID }}
+      API_TOKEN: ${{ secrets.API_TOKEN }}
+      API_CLIENT: ${{ secrets.API_CLIENT }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: HABITICA   # Match the name inside your environment.yml
+          environment-file: environment.yml
+          auto-activate-base: false
+          use-mamba: true                      # Faster dependency solving
+
+      - name: Verify environment
+        run: |
+          conda info
+          conda list
+
+      - name: Run Habitica report script
+        run: |
+          python src/main.py
