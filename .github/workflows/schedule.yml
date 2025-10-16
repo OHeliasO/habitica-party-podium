@@ -12,9 +12,9 @@ jobs:
     timeout-minutes: 5   # 🕔 Limit job runtime to 5 minutes total
 
     env:
-      API_USER_ID: ${{ secrets.API_USER_ID }}
-      API_TOKEN: ${{ secrets.API_TOKEN }}
-      API_CLIENT: ${{ secrets.API_CLIENT }}
+      HABITICA_USER_ID: ${{ secrets.HABITICA_USER_ID }}
+      HABITICA_API_TOKEN: ${{ secrets.HABITICA_API_TOKEN }}
+      HABITICA_CLIENT: ${{ secrets.HABITICA_CLIENT }}
 
     steps:
       - name: Checkout repository
