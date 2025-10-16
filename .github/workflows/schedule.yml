@@ -35,4 +35,7 @@ jobs:
           conda list
 
       - name: Run Habitica report script
-        run: conda run -n HABITICA python src/main.py
+        run: |
+          source $(conda info --base)/etc/profile.d/conda.sh
+          conda activate HABITICA
+          python src/main.py
