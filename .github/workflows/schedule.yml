@@ -27,6 +27,7 @@ jobs:
           environment-file: environment.yml
           auto-activate-base: false
           use-mamba: true                      # Faster dependency solving
+          cache: true                              # ✅ Enable caching
 
       - name: Verify environment
         run: |
