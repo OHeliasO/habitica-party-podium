@@ -101,7 +101,7 @@ def aggregate_team_skills(
     skills: Dict[str, int] = {}
     for msg in messages:
         info = msg.get("info", {})
-        if info.get("type") != "spell_cast_party":
+        if info.get("type") != "spell_cast_party" and info.get("type") != "spell_cast_party_multi":
             continue
         user = info.get("user")
         times = info.get("times", 1)
@@ -235,7 +235,7 @@ def main():
     # Filter spell_cast_party messages in the last 7 days
     recent_skill_msgs = [
         msg for msg in chat
-        if msg.get("info", {}).get("type") == "spell_cast_party"
+        if msg.get("info", {}).get("type") == "spell_cast_party" or msg.get("info", {}).get("type") == "spell_cast_party_multi"
         and datetime.fromtimestamp(msg["timestamp"] / 1000) >= seven_days_ago
     ]
     team_skills = aggregate_team_skills(recent_skill_msgs)
