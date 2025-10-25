@@ -222,34 +222,57 @@ def main():
         print("⚠️ No chat messages found.")
         return
 
-    recent_messages = filter_recent_boss_messages(chat, days=7)
+    # === Correct 7 full days ending yesterday ===
+    today = datetime.now().date()
+    yesterday = today - timedelta(days=1)
+
+    # period_start = 00:00:00 of (yesterday - 6 days)
+    period_start = datetime.combine(yesterday - timedelta(days=6), datetime.min.time())
+    # period_end = 23:59:59.999999 of yesterday (use datetime.max.time())
+    period_end = datetime.combine(yesterday, datetime.max.time())
+
+    # Filter boss messages strictly within that window
+    recent_messages = [
+        msg for msg in chat
+        if msg.get("info", {}).get("type") == "boss_damage"
+        and period_start <= datetime.fromtimestamp(msg["timestamp"] / 1000) <= period_end
+    ]
+
     if not recent_messages:
-        print("⚠️ No boss damage messages found in the last 7 days.")
+        print("⚠️ No boss damage messages found in the 7 full days ending yesterday.")
         return
+    
+    # print("🕒 Report period:")
+    # print("   Start:", period_start.isoformat())
+    # print("   End:  ", period_end.isoformat())
+
+
+    # Show a few timestamp samples to confirm range
+    # if recent_messages:
+    #     print("📅 Sample message timestamps:")
+    #     for msg in recent_messages[:5]:
+    #         ts = datetime.fromtimestamp(msg["timestamp"] / 1000)
+    #         print("   ", ts.isoformat(), msg.get("info", {}).get("user"))
 
     user_stats = aggregate_user_damage(recent_messages)
 
-    # Aggregate team skills from all chat messages in the period
-    now = datetime.now()
-    seven_days_ago = now - timedelta(days=7)
-    # Filter spell_cast_party messages in the last 7 days
+    # Filter spell_cast_party messages in that same window
     recent_skill_msgs = [
         msg for msg in chat
-        if msg.get("info", {}).get("type") == "spell_cast_party" or msg.get("info", {}).get("type") == "spell_cast_party_multi"
-        and datetime.fromtimestamp(msg["timestamp"] / 1000) >= seven_days_ago
+        if (
+            msg.get("info", {}).get("type") in ["spell_cast_party", "spell_cast_party_multi"]
+            and period_start <= datetime.fromtimestamp(msg["timestamp"] / 1000) <= period_end
+        )
     ]
     team_skills = aggregate_team_skills(recent_skill_msgs)
 
-    # Console report
-    # print_console_report(user_stats)
-
     # Generate Markdown podium
     markdown_report = generate_markdown_report(
-        user_stats, seven_days_ago, now, team_skills=team_skills
+        user_stats, period_start, period_end, team_skills=team_skills
     )
 
-    # Add a "last updated" line for visibility
-    last_updated = f"_Last updated: {now.strftime('%Y-%m-%d %H:%M')} UTC_"
+    # Add a "last updated" line for visibility (runs at current time)
+    last_updated = f"_Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')} UTC_"
     full_podium_md = f"{markdown_report}\n\n{last_updated}\n\n---"
 
     # Fetch group info
@@ -258,7 +281,7 @@ def main():
     group_id = group_data.get("_id")
     description = group_data.get("description", "")
 
-    if not group_id or not description:
+    if not group_id or description is None:
         print("⚠️ Could not find group ID or description.")
         return
 
